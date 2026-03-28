@@ -8,10 +8,10 @@
 		<version>4.0.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
+	<groupId>com.ritfast</groupId>
+	<artifactId>saas-security</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
+	<name>saas-security</name>
 	<description/>
 	<url/>
 	<licenses>

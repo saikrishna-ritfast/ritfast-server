@@ -1,8 +1,8 @@
+package com.ritfast.processor.entity;
 
-package com.ritfast.processor.client.entity;
-
-import main.java.com.ritfast.common.enums.LevelType;
-import main.java.com.ritfast.common.enums.StatusCode;
+import com.ritfast.common.enums.LevelType;
+import com.ritfast.common.enums.StatusCode;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Client {
-    @id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
