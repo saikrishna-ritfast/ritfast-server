@@ -1,7 +1,5 @@
 package com.ritfast.processor.dto;
 
-import com.ritfast.processor.entity.Client;
-import com.ritfast.processor.entity.User;
 import lombok.Builder;
 import lombok.Data;
 

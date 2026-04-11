@@ -1,4 +1,4 @@
-package main.java.com.ritfast.common.enums;
+package com.ritfast.common.enums;
 
 public enum RoleCode {
     ROLE_OWNER,

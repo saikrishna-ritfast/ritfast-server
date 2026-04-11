@@ -1,4 +1,4 @@
-package com.ritfast.security;
+package com.ritfast.common;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
