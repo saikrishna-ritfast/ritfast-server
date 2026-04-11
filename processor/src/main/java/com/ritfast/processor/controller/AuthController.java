@@ -1,6 +1,7 @@
 package com.ritfast.processor.controller;
 
 import com.ritfast.processor.dto.AuthResponse;
+import com.ritfast.processor.dto.LoginRequest;
 import com.ritfast.processor.dto.SignUpRequest;
 import com.ritfast.processor.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,9 @@ public class AuthController {
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<>
+    public ResponseEntity<AuthResponse> signIn(@RequestBody LoginRequest request){
+        AuthResponse response = authService.signIn(request);
+        return ResponseEntity.ok(response);
+    }
+
 }

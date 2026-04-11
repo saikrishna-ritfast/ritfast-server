@@ -4,6 +4,7 @@ import com.ritfast.common.enums.LevelType;
 import com.ritfast.common.enums.RoleCode;
 import com.ritfast.common.enums.StatusCode;
 import com.ritfast.processor.dto.AuthResponse;
+import com.ritfast.processor.dto.LoginRequest;
 import com.ritfast.processor.dto.SignUpRequest;
 import com.ritfast.processor.entity.Client;
 import com.ritfast.processor.entity.Role;
@@ -13,6 +14,10 @@ import com.ritfast.processor.repository.RoleRepository;
 import com.ritfast.processor.repository.UserRepository;
 import com.ritfast.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +35,7 @@ public class AuthService {
         private final RoleRepository roleRepository;
         private final PasswordEncoder passwordEncoder;
         private final JwtTokenProvider jwtTokenProvider;
+        private final AuthenticationManager authenticationManager;
 
         @Transactional
         public AuthResponse signUp(SignUpRequest request) {
@@ -100,4 +106,29 @@ public class AuthService {
                                 .loggedInClientCode(client.getCode())
                                 .build();
         }
+
+        @Transactional(readOnly = true)
+        public AuthResponse signIn(LoginRequest request) {
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
+
+                User user = userRepository.findByEmailId(request.getEmailId())
+                                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
+                Client client = user.getClient();
+
+                 List<String> authorities = user.getRoles().stream()
+                         .map( r -> r.getCode().name())
+                         .collect(Collectors.toList());
+
+                 AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
+                         .id(user.getId())
+                         .clientId(client.getId())
+                         .emailId(user.getEmailId())
+                         .firstName(user.getFirstName())
+                         .build();
+
+                return null;
+        }
+
 }
