@@ -2,6 +2,7 @@ package com.ritfast.processor.controller;
 
 import com.ritfast.processor.dto.AuthResponse;
 import com.ritfast.processor.dto.LoginRequest;
+import com.ritfast.processor.dto.PasswordRequest;
 import com.ritfast.processor.dto.SignUpRequest;
 import com.ritfast.processor.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,13 @@ public class AuthController {
         AuthResponse response = authService.signIn(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<Boolean> forgotPassword(@RequestBody PasswordRequest request){
+        Boolean response = authService.forgotPassword(request);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
