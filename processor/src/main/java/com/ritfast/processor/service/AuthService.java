@@ -26,6 +26,9 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -40,7 +43,7 @@ public class AuthService {
         @Transactional
         public AuthResponse signUp(SignUpRequest request) {
                 if (userRepository.findByEmailId(request.getEmailId()).isPresent()) {
-                        throw new IllegalArgumentException("Email already in use");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
                 }
 
                 // Create Client
@@ -109,26 +112,53 @@ public class AuthService {
 
         @Transactional(readOnly = true)
         public AuthResponse signIn(LoginRequest request) {
-                Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
+                Authentication authentication;
+                try {
+                        authenticationManager.authenticate(
+                                        new UsernamePasswordAuthenticationToken(
+                                                        request.getEmailId(),
+                                                        request.getPassword()));
+                } catch (Exception e) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+                }
 
                 User user = userRepository.findByEmailId(request.getEmailId())
-                                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+                String data = user.getEmailId();
 
                 Client client = user.getClient();
 
-                 List<String> authorities = user.getRoles().stream()
-                         .map( r -> r.getCode().name())
-                         .collect(Collectors.toList());
+                List<String> authorities = user.getRoles().stream()
+                                .map(r -> r.getCode().name())
+                                .collect(Collectors.toList());
 
-                 AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
-                         .id(user.getId())
-                         .clientId(client.getId())
-                         .emailId(user.getEmailId())
-                         .firstName(user.getFirstName())
-                         .build();
+                AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
+                                .id(user.getId())
+                                .clientId(client.getId())
+                                .emailId(user.getEmailId())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .statusCode(user.getStatusCode().name())
+                                .stringAuthorities(authorities)
+                                .build();
 
-                return null;
+                AuthResponse.ClientResponse clientResponse = AuthResponse.ClientResponse.builder()
+                                .id(client.getId())
+                                .name(client.getName())
+                                .code(client.getCode())
+                                .typeCode(client.getTypeCode())
+                                .levelType(client.getLevelType().name())
+                                .statusCode(client.getStatusCode().name())
+                                .build();
+
+                String token = jwtTokenProvider.generateTokenFromEmail(user.getEmailId());
+
+                return AuthResponse.builder()
+                                .user(userResponse)
+                                .client(clientResponse)
+                                .accessToken(token)
+                                .loggedInClientId(client.getId())
+                                .loggedInClientCode(client.getCode())
+                                .build();
         }
-
 }
