@@ -43,6 +43,7 @@ public class AuthService {
 
         @Transactional
         public AuthResponse signUp(SignUpRequest request) {
+
                 if (userRepository.findByEmailId(request.getEmailId()).isPresent()) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
                 }
