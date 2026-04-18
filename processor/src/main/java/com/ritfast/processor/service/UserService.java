@@ -58,6 +58,11 @@ public class UserService {
 
     }
 
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -70,14 +75,20 @@ public class UserService {
         } else {
             email = principal.toString();
         }
+
         return userRepository.findByEmailId(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authenticated user not found"));
-
     }
 
     private UserResponse mapToResponse(User user) {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getCode().name())
+                .collect(Collectors.toList());
+
+        List<String> permissions = user.getRoles().stream()
+                .flatMap(r -> r.getPermissions().stream())
+                .map(p -> p.getCode().name())
+                .distinct()
                 .collect(Collectors.toList());
 
         return UserResponse.builder()
@@ -89,6 +100,7 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .statusCode(user.getStatusCode().name())
                 .roles(roles)
+                .permissions(permissions)
                 .build();
     }
 

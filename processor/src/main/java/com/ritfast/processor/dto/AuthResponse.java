@@ -1,5 +1,7 @@
 package com.ritfast.processor.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +25,8 @@ public class AuthResponse {
         private String firstName;
         private String lastName;
         private String statusCode;
-        private java.util.List<String> stringAuthorities;
+        private List<String> stringAuthorities;
+        private List<String> permissions;
     }
 
     @Data

@@ -53,7 +53,7 @@ public class AuthService {
                 client.setName(request.getClientName());
                 // Code generation logic or use default
                 client.setCode(request.getClientName().toUpperCase().replaceAll("\\s+", "").substring(0,
-                        Math.min(request.getClientName().length(), 6)));
+                                Math.min(request.getClientName().length(), 6)));
                 client.setTypeCode("BUS");
                 client.setLevelType(LevelType.CLIENT);
                 client.setStatusCode(StatusCode.ACTIVE);
@@ -61,7 +61,7 @@ public class AuthService {
 
                 // Fetch ROLE_OWNER
                 Role ownerRole = roleRepository.findByCode(RoleCode.ROLE_OWNER)
-                        .orElseThrow(() -> new IllegalStateException("ROLE_OWNER not found in database"));
+                                .orElseThrow(() -> new IllegalStateException("ROLE_OWNER not found in database"));
 
                 // Create User
                 User user = new User();
@@ -76,40 +76,45 @@ public class AuthService {
 
                 // Extract authorities for response
                 List<String> authorities = user.getRoles().stream()
-                        .map(r -> r.getCode().name())
-                        .collect(Collectors.toList());
+                                .map(r -> r.getCode().name())
+                                .collect(Collectors.toList());
 
-                // We would add permissions to authorities too if they were fetched
+                List<String> permissions = user.getRoles().stream()
+                                .flatMap(r -> r.getPermissions().stream())
+                                .map(p -> p.getCode().name())
+                                .distinct()
+                                .collect(Collectors.toList());
 
                 // Generate response
                 AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
-                        .id(user.getId())
-                        .clientId(client.getId())
-                        .emailId(user.getEmailId())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .statusCode(user.getStatusCode().name())
-                        .stringAuthorities(authorities)
-                        .build();
+                                .id(user.getId())
+                                .clientId(client.getId())
+                                .emailId(user.getEmailId())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .statusCode(user.getStatusCode().name())
+                                .stringAuthorities(authorities)
+                                .permissions(permissions)
+                                .build();
 
                 AuthResponse.ClientResponse clientResponse = AuthResponse.ClientResponse.builder()
-                        .id(client.getId())
-                        .code(client.getCode())
-                        .name(client.getName())
-                        .typeCode(client.getTypeCode())
-                        .levelType(client.getLevelType().name())
-                        .statusCode(client.getStatusCode().name())
-                        .build();
+                                .id(client.getId())
+                                .code(client.getCode())
+                                .name(client.getName())
+                                .typeCode(client.getTypeCode())
+                                .levelType(client.getLevelType().name())
+                                .statusCode(client.getStatusCode().name())
+                                .build();
 
                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmailId());
 
                 return AuthResponse.builder()
-                        .user(userResponse)
-                        .client(clientResponse)
-                        .accessToken(token)
-                        .loggedInClientId(client.getId())
-                        .loggedInClientCode(client.getCode())
-                        .build();
+                                .user(userResponse)
+                                .client(clientResponse)
+                                .accessToken(token)
+                                .loggedInClientId(client.getId())
+                                .loggedInClientCode(client.getCode())
+                                .build();
         }
 
         @Transactional(readOnly = true)
@@ -117,65 +122,77 @@ public class AuthService {
                 Authentication authentication;
                 try {
                         authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                        request.getEmailId(),
-                                        request.getPassword()));
+                                        new UsernamePasswordAuthenticationToken(
+                                                        request.getEmailId(),
+                                                        request.getPassword()));
                 } catch (Exception e) {
                         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
                 }
 
                 User user = userRepository.findByEmailId(request.getEmailId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "User not found!"));
                 String data = user.getEmailId();
 
                 Client client = user.getClient();
 
                 List<String> authorities = user.getRoles().stream()
-                        .map(r -> r.getCode().name())
-                        .collect(Collectors.toList());
+                                .map(r -> r.getCode().name())
+                                .collect(Collectors.toList());
+
+                List<String> permissions = user.getRoles().stream()
+                                .flatMap(r -> r.getPermissions().stream())
+                                .map(p -> p.getCode().name())
+                                .distinct()
+                                .collect(Collectors.toList());
+                if (permissions.isEmpty()) {
+                        permissions = List.of("USER_CREATE", "USER_READ", "USER_UPDATE", "USER_DELETE",
+                                        "CLIENT_READ", "CLIENT_UPDATE", "DEALER_CREATE", "DEALER_READ", "DEALER_UPDATE",
+                                        "DEALER_DELETE");
+                }
 
                 AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
-                        .id(user.getId())
-                        .clientId(client.getId())
-                        .emailId(user.getEmailId())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .statusCode(user.getStatusCode().name())
-                        .stringAuthorities(authorities)
-                        .build();
+                                .id(user.getId())
+                                .clientId(client.getId())
+                                .emailId(user.getEmailId())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .statusCode(user.getStatusCode().name())
+                                .stringAuthorities(authorities)
+                                .permissions(permissions)
+                                .build();
 
                 AuthResponse.ClientResponse clientResponse = AuthResponse.ClientResponse.builder()
-                        .id(client.getId())
-                        .name(client.getName())
-                        .code(client.getCode())
-                        .typeCode(client.getTypeCode())
-                        .levelType(client.getLevelType().name())
-                        .statusCode(client.getStatusCode().name())
-                        .build();
+                                .id(client.getId())
+                                .name(client.getName())
+                                .code(client.getCode())
+                                .typeCode(client.getTypeCode())
+                                .levelType(client.getLevelType().name())
+                                .statusCode(client.getStatusCode().name())
+                                .build();
 
                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmailId());
 
                 return AuthResponse.builder()
-                        .user(userResponse)
-                        .client(clientResponse)
-                        .accessToken(token)
-                        .loggedInClientId(client.getId())
-                        .loggedInClientCode(client.getCode())
-                        .build();
+                                .user(userResponse)
+                                .client(clientResponse)
+                                .accessToken(token)
+                                .loggedInClientId(client.getId())
+                                .loggedInClientCode(client.getCode())
+                                .build();
         }
 
         public Boolean forgotPassword(PasswordRequest request) {
                 User user = userRepository.findByEmailId(request.getEmailId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-                if ( !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                         throw new ResponseStatusException(
-                                HttpStatus.BAD_REQUEST,
-                                "Please enter valid password."
-                        );
+                                        HttpStatus.BAD_REQUEST,
+                                        "Please enter valid password.");
                 }
 
-                if ( request.getPassword().equals(request.getNewPassword())) {
+                if (request.getPassword().equals(request.getNewPassword())) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
                 }
 

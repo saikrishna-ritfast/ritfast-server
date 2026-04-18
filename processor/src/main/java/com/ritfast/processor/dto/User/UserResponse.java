@@ -16,4 +16,5 @@ public class UserResponse {
     private String phoneNumber;
     private String statusCode;
     private List<String> roles;
+    private List<String> permissions;
 }
