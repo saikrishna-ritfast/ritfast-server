@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -31,7 +32,7 @@ public class DataInitializer implements CommandLineRunner {
                     .orElseGet(() -> {
                         Permission newPerm = new Permission();
                         newPerm.setCode(code);
-                        newPerm.setName("Permission " + code.name().replace("_", " "));
+                        newPerm.setName( code.name().replace("_", " "));
                         return permissionRepository.save(newPerm);
                     });
             allPermissions.add(permission);
@@ -52,6 +53,18 @@ public class DataInitializer implements CommandLineRunner {
             // (e.g. ROLE_EMPLOYEE)
             if (roleCode.equals(RoleCode.ROLE_OWNER)) {
                 role.setPermissions(allPermissions);
+            }
+
+            if (roleCode.equals(RoleCode.ROLE_EMPLOYEE)) {
+                List<String> employeePermissionCodes = List.of("USER_READ", "USER_UPDATE",
+                        "CLIENT_READ", "DEALER_READ", "DEALER_UPDATE",
+                        "DEALER_DELETE");
+
+                Set<Permission> employeePermissions = allPermissions.stream()
+                        .filter(p -> employeePermissionCodes.contains(p.getCode().name()))
+                        .collect(java.util.stream.Collectors.toSet());
+
+                role.setPermissions(employeePermissions);
             }
             roleRepository.save(role);
         });

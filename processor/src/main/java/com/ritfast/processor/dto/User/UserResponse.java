@@ -5,8 +5,11 @@ import lombok.Data;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
     private Long id;
     private Long clientId;

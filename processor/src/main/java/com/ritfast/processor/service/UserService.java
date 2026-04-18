@@ -1,6 +1,7 @@
 package com.ritfast.processor.service;
 
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.ritfast.common.enums.RoleCode;
@@ -58,9 +59,10 @@ public class UserService {
 
     }
 
+    @Transactional
     public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+        List<User> users = userRepository.findByClientId(getAuthenticatedUser().getClient().getId());
+        return users.stream().map(this::mapToResponseWithOutPermission).collect(Collectors.toList());
     }
 
     private User getAuthenticatedUser() {
@@ -104,4 +106,20 @@ public class UserService {
                 .build();
     }
 
+    private UserResponse mapToResponseWithOutPermission(User user) {
+        List<String> roles = user.getRoles().stream()
+                .map(r -> r.getCode().name())
+                .collect(Collectors.toList());
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .clientId(user.getClient().getId())
+                .emailId(user.getEmailId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .statusCode(user.getStatusCode().name())
+                .roles(roles)
+                .build();
+    }
 }
