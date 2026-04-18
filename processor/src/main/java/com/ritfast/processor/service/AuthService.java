@@ -145,11 +145,6 @@ public class AuthService {
                                 .map(p -> p.getCode().name())
                                 .distinct()
                                 .collect(Collectors.toList());
-                if (permissions.isEmpty()) {
-                        permissions = List.of("USER_CREATE", "USER_READ", "USER_UPDATE", "USER_DELETE",
-                                        "CLIENT_READ", "CLIENT_UPDATE", "DEALER_CREATE", "DEALER_READ", "DEALER_UPDATE",
-                                        "DEALER_DELETE");
-                }
 
                 AuthResponse.UserResponse userResponse = AuthResponse.UserResponse.builder()
                                 .id(user.getId())

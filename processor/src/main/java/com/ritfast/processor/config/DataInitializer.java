@@ -1,29 +1,59 @@
 package com.ritfast.processor.config;
 
+import com.ritfast.common.enums.PermissionCode;
 import com.ritfast.common.enums.RoleCode;
+import com.ritfast.processor.entity.Permission;
 import com.ritfast.processor.entity.Role;
+import com.ritfast.processor.repository.PermissionRepository;
 import com.ritfast.processor.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
     @Override
     public void run(String... args) {
+
+        // Initialize permissions
+        Set<Permission> allPermissions = new HashSet<>();
+        Arrays.stream(PermissionCode.values()).forEach(code -> {
+            Permission permission = permissionRepository.findByCode(code)
+                    .orElseGet(() -> {
+                        Permission newPerm = new Permission();
+                        newPerm.setCode(code);
+                        newPerm.setName("Permission " + code.name().replace("_", " "));
+                        return permissionRepository.save(newPerm);
+                    });
+            allPermissions.add(permission);
+        });
+
+        // 2. Initialize roles and assign permissions
         Arrays.stream(RoleCode.values()).forEach(roleCode -> {
-            if (roleRepository.findByCode(roleCode).isEmpty()) {
-                Role role = new Role();
-                role.setCode(roleCode);
-                role.setName("Role " + roleCode.name().replace("ROLE_", ""));
-                roleRepository.save(role);
+            Role role = roleRepository.findByCode(roleCode)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setCode(roleCode);
+                        newRole.setName("Role " + roleCode.name().replace("ROLE_", " "));
+                        return newRole;
+                    });
+
+            // Assign ALL permissions to ROLE_OWNER
+            // You can adjust this later to assign specific permissions to specific roles
+            // (e.g. ROLE_EMPLOYEE)
+            if (roleCode.equals(RoleCode.ROLE_OWNER)) {
+                role.setPermissions(allPermissions);
             }
+            roleRepository.save(role);
         });
     }
 }
