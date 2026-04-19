@@ -31,4 +31,4 @@ ENV PORT=8080
 EXPOSE $PORT
 
 # Command to run the application, binding to the Render-provided PORT
-ENTRYPOINT ["sh", "-c", "java -Xmx256m -Dserver.port=${PORT} -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
