@@ -55,6 +55,7 @@ public class UserService {
         user.setEmailId(request.getEmailId());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+        user.setName(request.getFirstName() + " " + request.getLastName());
         user.setClient(client);
         user.setPhoneNumber(request.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -127,6 +128,7 @@ public class UserService {
                 .emailId(user.getEmailId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .name(user.getFirstName() + " " + user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
                 .statusCode(user.getStatusCode().name())
                 .roles(roles)
@@ -152,6 +154,7 @@ public class UserService {
                 .emailId(user.getEmailId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .name(user.getFirstName() + " " + user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
                 .statusCode(user.getStatusCode().name())
                 .roles(roles)

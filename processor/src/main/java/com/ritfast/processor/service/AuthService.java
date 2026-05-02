@@ -68,6 +68,7 @@ public class AuthService {
                 user.setEmailId(request.getEmailId());
                 user.setFirstName(request.getFirstName());
                 user.setLastName(request.getLastName());
+                user.setName(request.getFirstName() + " " + request.getLastName());
                 user.setPhoneNumber(request.getPhoneNumber());
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
                 user.setClient(client);
@@ -102,6 +103,7 @@ public class AuthService {
                                 .emailId(user.getEmailId())
                                 .firstName(user.getFirstName())
                                 .lastName(user.getLastName())
+                                .name(user.getFirstName() + " " + user.getLastName())
                                 .statusCode(user.getStatusCode().name())
                                 .stringAuthorities(authorities)
                                 .permissions(permissions)
@@ -172,6 +174,7 @@ public class AuthService {
                                 .emailId(user.getEmailId())
                                 .firstName(user.getFirstName())
                                 .lastName(user.getLastName())
+                                .name(user.getFirstName() + " " + user.getLastName())
                                 .statusCode(user.getStatusCode().name())
                                 .stringAuthorities(authorities)
                                 .permissions(permissions)

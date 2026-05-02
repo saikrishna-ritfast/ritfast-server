@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import com.ritfast.processor.dto.base.MetaData;
+
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,6 +24,7 @@ public class AuthResponse {
         private String emailId;
         private String firstName;
         private String lastName;
+        private String name;
         private String statusCode;
         private List<String> stringAuthorities;
         private List<String> permissions;

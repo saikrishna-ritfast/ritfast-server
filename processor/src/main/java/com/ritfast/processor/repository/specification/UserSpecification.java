@@ -25,7 +25,6 @@ public class UserSpecification {
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("phoneNumber")), likeSearch));
                 predicates.add(searchPredicate);
             }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

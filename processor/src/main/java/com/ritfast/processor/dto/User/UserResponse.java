@@ -17,6 +17,7 @@ public class UserResponse extends MetaData {
     private String emailId;
     private String firstName;
     private String lastName;
+    private String name;
     private String phoneNumber;
     private String statusCode;
     private List<String> roles;
