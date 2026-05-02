@@ -32,7 +32,7 @@ public class DataInitializer implements CommandLineRunner {
                     .orElseGet(() -> {
                         Permission newPerm = new Permission();
                         newPerm.setCode(code);
-                        newPerm.setName( code.name().replace("_", " "));
+                        newPerm.setName(code.name().replace("_", " "));
                         return permissionRepository.save(newPerm);
                     });
             allPermissions.add(permission);

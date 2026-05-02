@@ -3,6 +3,7 @@ package com.ritfast.processor.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.ritfast.processor.dto.base.MetaData;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import com.ritfast.common.enums.StatusCode;
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class User extends MetaData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

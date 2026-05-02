@@ -2,6 +2,7 @@ package com.ritfast.processor.entity;
 
 import com.ritfast.common.enums.LevelType;
 import com.ritfast.common.enums.StatusCode;
+import com.ritfast.processor.dto.base.MetaData;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Table(name = "clients")
 @Getter
 @Setter
-public class Client {
+public class Client extends MetaData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

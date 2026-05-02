@@ -1,8 +1,12 @@
 package com.ritfast.processor.controller;
 
+import com.ritfast.common.dto.PageResponse;
 import com.ritfast.processor.dto.User.UserRequest;
 import com.ritfast.processor.dto.User.UserResponse;
 import com.ritfast.processor.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,8 +33,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> response = userService.getAllUsers();
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 10) Pageable pageable) {
+        PageResponse<UserResponse> response = userService.getAllUsers(search, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

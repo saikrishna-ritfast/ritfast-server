@@ -1,11 +1,10 @@
 package com.ritfast.processor.dto;
 
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-
+import com.ritfast.processor.dto.base.MetaData;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +17,7 @@ public class AuthResponse {
 
     @Data
     @Builder
-    public static class UserResponse {
+    public static class UserResponse extends MetaData {
         private Long id;
         private Long clientId;
         private String emailId;
@@ -31,7 +30,7 @@ public class AuthResponse {
 
     @Data
     @Builder
-    public static class ClientResponse {
+    public static class ClientResponse extends MetaData {
         private Long id;
         private String code;
         private String name;

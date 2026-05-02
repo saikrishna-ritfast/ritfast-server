@@ -1,5 +1,6 @@
 package com.ritfast.processor.dto.User;
 
+import com.ritfast.processor.dto.base.MetaData;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse {
+public class UserResponse extends MetaData {
     private Long id;
     private Long clientId;
     private String emailId;

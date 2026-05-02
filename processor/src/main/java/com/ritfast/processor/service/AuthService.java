@@ -7,6 +7,7 @@ import com.ritfast.processor.dto.AuthResponse;
 import com.ritfast.processor.dto.LoginRequest;
 import com.ritfast.processor.dto.PasswordRequest;
 import com.ritfast.processor.dto.SignUpRequest;
+import com.ritfast.processor.dto.base.MetaData;
 import com.ritfast.processor.entity.Client;
 import com.ritfast.processor.entity.Role;
 import com.ritfast.processor.entity.User;
@@ -15,18 +16,14 @@ import com.ritfast.processor.repository.RoleRepository;
 import com.ritfast.processor.repository.UserRepository;
 import com.ritfast.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
 import java.util.stream.Collectors;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,6 +54,9 @@ public class AuthService {
                 client.setTypeCode("BUS");
                 client.setLevelType(LevelType.CLIENT);
                 client.setStatusCode(StatusCode.ACTIVE);
+
+                client.setCreateAt(java.time.LocalDateTime.now().toString());
+                client.setUpdateAt(java.time.LocalDateTime.now().toString());
                 client = clientRepository.save(client);
 
                 // Fetch ROLE_OWNER
@@ -72,7 +72,17 @@ public class AuthService {
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
                 user.setClient(client);
                 user.getRoles().add(ownerRole);
+                user.setCreateAt(java.time.LocalDateTime.now().toString());
+                user.setUpdateAt(java.time.LocalDateTime.now().toString());
                 user = userRepository.save(user);
+
+                // Set creator ID for self-signup
+                user.setCreateBy(user.getId());
+                user.setUpdateBy(user.getId());
+                client.setCreateBy(user.getId());
+                client.setUpdateBy(user.getId());
+                userRepository.save(user);
+                clientRepository.save(client);
 
                 // Extract authorities for response
                 List<String> authorities = user.getRoles().stream()
@@ -97,6 +107,11 @@ public class AuthService {
                                 .permissions(permissions)
                                 .build();
 
+                userResponse.setCreateBy(user.getCreateBy());
+                userResponse.setCreateAt(user.getCreateAt());
+                userResponse.setUpdateBy(user.getUpdateBy());
+                userResponse.setUpdateAt(user.getUpdateAt());
+
                 AuthResponse.ClientResponse clientResponse = AuthResponse.ClientResponse.builder()
                                 .id(client.getId())
                                 .code(client.getCode())
@@ -105,6 +120,11 @@ public class AuthService {
                                 .levelType(client.getLevelType().name())
                                 .statusCode(client.getStatusCode().name())
                                 .build();
+
+                clientResponse.setCreateBy(client.getCreateBy());
+                clientResponse.setCreateAt(client.getCreateAt());
+                clientResponse.setUpdateBy(client.getUpdateBy());
+                clientResponse.setUpdateAt(client.getUpdateAt());
 
                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmailId());
 
@@ -157,6 +177,11 @@ public class AuthService {
                                 .permissions(permissions)
                                 .build();
 
+                userResponse.setCreateBy(user.getCreateBy());
+                userResponse.setCreateAt(user.getCreateAt());
+                userResponse.setUpdateBy(user.getUpdateBy());
+                userResponse.setUpdateAt(user.getUpdateAt());
+
                 AuthResponse.ClientResponse clientResponse = AuthResponse.ClientResponse.builder()
                                 .id(client.getId())
                                 .name(client.getName())
@@ -165,6 +190,11 @@ public class AuthService {
                                 .levelType(client.getLevelType().name())
                                 .statusCode(client.getStatusCode().name())
                                 .build();
+
+                clientResponse.setCreateBy(client.getCreateBy());
+                clientResponse.setCreateAt(client.getCreateAt());
+                clientResponse.setUpdateBy(client.getUpdateBy());
+                clientResponse.setUpdateAt(client.getUpdateAt());
 
                 String token = jwtTokenProvider.generateTokenFromEmail(user.getEmailId());
 
