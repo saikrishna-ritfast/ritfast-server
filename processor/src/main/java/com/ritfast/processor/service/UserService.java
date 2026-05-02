@@ -43,6 +43,11 @@ public class UserService {
         User currentUser = new User();
         Client client = getAuthenticatedUser().getClient();
 
+        if (request.getFirstName().isBlank() || request.getLastName().isBlank() || request.getEmailId().isBlank()
+                || request.getPassword().isBlank() || request.getPhoneNumber().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All fields are required.");
+        }
+
         if (userRepository.findByEmailId(request.getEmailId()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use.");
         }
