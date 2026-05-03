@@ -27,7 +27,7 @@ import com.ritfast.processor.dto.User.UserRequest;
 import com.ritfast.processor.entity.Client;
 import com.ritfast.processor.entity.User;
 import com.ritfast.processor.repository.UserRepository;
-import com.ritfast.processor.repository.specification.UserSpecification;
+import com.ritfast.processor.repository.specification.BaseSpecification;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -81,7 +81,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public PageResponse<UserResponse> getAllUsers(String search, Pageable pageable) {
         Long clientId = getAuthenticatedUser().getClient().getId();
-        Specification<User> spec = UserSpecification.filterUsers(clientId, search);
+        Specification<User> spec = BaseSpecification.filterByClientAndSearch(
+                clientId, search, List.of("emailId", "firstName", "lastName", "phoneNumber"));
 
         Page<User> userPage = userRepository.findAll(spec, pageable);
 
